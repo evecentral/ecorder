@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/evecentral/eccore"
 	"github.com/gorilla/mux"
 	"github.com/theatrus/crestmarket"
 	"github.com/theatrus/crestmarket/helper"
+	"github.com/theatrus/gomemcache/memcache"
 	"log"
 	"net/http"
 )
