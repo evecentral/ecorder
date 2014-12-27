@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/evecentral/eccore"
+	"github.com/evecentral/ecorder"
 	"github.com/gorilla/mux"
 	"github.com/theatrus/crestmarket"
 	"github.com/theatrus/crestmarket/helper"
@@ -59,6 +60,12 @@ func main() {
 
 	if requestor == nil {
 		log.Fatal("wut")
+	}
+
+	log.Println("Building hydrator")
+	_, err = ecorder.NewCrestHydrator(requestor)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	rtr := mux.NewRouter()
