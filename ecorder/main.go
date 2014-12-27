@@ -36,7 +36,7 @@ func main() {
 	}
 
 	log.Println("Building a static cache of the universe")
-	_, err = eccore.NewStaticItemsFromDatabase(db)
+	static, err := eccore.NewStaticItemsFromDatabase(db)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,10 +63,17 @@ func main() {
 	}
 
 	log.Println("Building hydrator")
-	_, err = ecorder.NewCrestHydrator(requestor)
+	hydrator, err := ecorder.NewCrestHydrator(requestor, static)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("Building cache")
+	orderCache := &ecorder.OrderCache{Hydrator: hydrator,
+		Mc: mc}
+
+	test, err := orderCache.OrdersForType(34, 10000002)
+	log.Printf("%s", test)
 
 	rtr := mux.NewRouter()
 

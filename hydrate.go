@@ -18,8 +18,8 @@ type crestHydrator struct {
 
 // NewCrestHydrator bootstraps an appropiate CREST
 // based order hydration source.
-func NewCrestHydrator(req crestmarket.CRESTRequestor) (Hydrator, error) {
-	ch := &crestHydrator{crest: req}
+func NewCrestHydrator(req crestmarket.CRESTRequestor, static eccore.StaticItems) (Hydrator, error) {
+	ch := &crestHydrator{crest: req, static: static}
 
 	types, err := req.Types()
 	if err != nil {

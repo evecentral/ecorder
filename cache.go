@@ -30,8 +30,8 @@ type orderEntry struct {
 // and an optional Hydrator interface for cache
 // misses
 type OrderCache struct {
-	mc       memcache.Client
-	hydrator Hydrator
+	Mc       memcache.Client
+	Hydrator Hydrator
 }
 
 // cacheKey generates a single memcache key for an order
@@ -55,11 +55,11 @@ func unpackOrder(value []byte) (orderEntry, error) {
 }
 
 func (c *OrderCache) hydrateSingleOrder(typeid int, regionid int) ([]eccore.MarketOrder, error) {
-	if c.hydrator == nil {
+	if c.Hydrator == nil {
 		return nil, ErrorNoHydrationSource
 	}
 
-	orders, err := c.hydrator.OrdersForType(typeid, regionid)
+	orders, err := c.Hydrator.OrdersForType(typeid, regionid)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (c *OrderCache) hydrateSingleOrder(typeid int, regionid int) ([]eccore.Mark
 	entry := orderEntry{Orders: orders, At: time.Now()}
 	encodedOrders := packOrder(entry)
 
-	c.mc.Set(&memcache.Item{
+	c.Mc.Set(&memcache.Item{
 		Key:        key,
 		Value:      encodedOrders,
 		Expiration: int32(cacheExpires.Seconds())})
@@ -83,21 +83,23 @@ func (c *OrderCache) OrdersForType(typeid int, regionid int) ([]eccore.MarketOrd
 
 	key := cacheKey(typeid, regionid)
 
-	item, err := c.mc.Get(key)
+	item, err := c.Mc.Get(key)
 
 	if err != nil && err != memcache.ErrCacheMiss {
 		return nil, err
+	} else if err == memcache.ErrCacheMiss {
+		// Cache didn't return, now we hydrate and return
+		return c.hydrateSingleOrder(typeid, regionid)
 	} else {
 		orderEntry, err := unpackOrder(item.Value)
 		if err != nil {
 			return nil, err
 		}
 		// Entry too old?
-		if orderEntry.At.Add(cacheExpires).After(time.Now()) {
+		if !orderEntry.At.Add(cacheExpires).After(time.Now()) {
 			return orderEntry.Orders, nil
+		} else {
+			return c.hydrateSingleOrder(typeid, regionid)
 		}
 	}
-
-	// Cache didn't return, now we hydrate and return
-	return c.hydrateSingleOrder(typeid, regionid)
 }
