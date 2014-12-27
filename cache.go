@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/evecentral/eccore"
-	"github.com/theatrus/crestmarket"
 	"github.com/theatrus/gomemcache/memcache"
 	"time"
 )
@@ -24,57 +23,6 @@ var (
 type orderEntry struct {
 	Orders []eccore.MarketOrder
 	At     time.Time
-}
-
-type Hydrator interface {
-	OrdersForType(typeid int, regionid int) ([]eccore.MarketOrder, error)
-}
-
-type crestHydrator struct {
-	crest   crestmarket.CRESTRequestor
-	types   *crestmarket.MarketTypes
-	regions *crestmarket.Regions
-	static  eccore.StaticItems
-}
-
-// NewCrestHydrator bootstraps an appropiate CREST
-// based order hydration source.
-func NewCrestHydrator(req crestmarket.CRESTRequestor) (Hydrator, error) {
-	ch := &crestHydrator{crest: req}
-
-	types, err := req.Types()
-	if err != nil {
-		return nil, err
-	}
-
-	regions, err := req.Regions()
-	if err != nil {
-		return nil, err
-	}
-
-	ch.types = types
-	ch.regions = regions
-
-	return ch, nil
-}
-
-func (ch *crestHydrator) OrdersForType(typeid int, regionid int) ([]eccore.MarketOrder, error) {
-	itemType := ch.types.ById(typeid)
-	region := ch.regions.ById(regionid)
-
-	if itemType == nil || region == nil {
-		return nil, ErrorUnfetchableItem
-	}
-
-	orders, err := ch.crest.BuySellMarketOrders(region, itemType)
-	if err != nil {
-		return nil, err
-	}
-	rOrders := make([]eccore.MarketOrder, len(orders.Orders))
-	for i, order := range orders.Orders {
-		rOrders[i] = eccore.CRESTToOrder(order, ch.static)
-	}
-	return rOrders, nil
 }
 
 // OrderCache represents a caching order
@@ -111,7 +59,21 @@ func (c *OrderCache) hydrateSingleOrder(typeid int, regionid int) ([]eccore.Mark
 		return nil, ErrorNoHydrationSource
 	}
 
-	return nil, nil
+	orders, err := c.hydrator.OrdersForType(typeid, regionid)
+	if err != nil {
+		return nil, err
+	}
+
+	key := cacheKey(typeid, regionid)
+	entry := orderEntry{Orders: orders, At: time.Now()}
+	encodedOrders := packOrder(entry)
+
+	c.mc.Set(&memcache.Item{
+		Key:        key,
+		Value:      encodedOrders,
+		Expiration: int32(cacheExpires.Seconds())})
+
+	return orders, nil
 }
 
 func (c *OrderCache) OrdersForType(typeid int, regionid int) ([]eccore.MarketOrder, error) {
@@ -137,6 +99,5 @@ func (c *OrderCache) OrdersForType(typeid int, regionid int) ([]eccore.MarketOrd
 	}
 
 	// Cache didn't return, now we hydrate and return
-
-	return nil, nil
+	return c.hydrateSingleOrder(typeid, regionid)
 }
