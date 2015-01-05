@@ -18,6 +18,9 @@ var (
 
 	// Default cache expiration
 	cacheExpires = 5 * time.Minute
+
+	// Memcache expiration for the key
+	cacheMcExpires = 6 * time.Hour 
 )
 
 type orderEntry struct {
@@ -71,7 +74,7 @@ func (c *OrderCache) hydrateSingleOrder(typeid int, regionid int) ([]eccore.Mark
 	c.Mc.Set(&memcache.Item{
 		Key:        key,
 		Value:      encodedOrders,
-		Expiration: int32(cacheExpires.Seconds())})
+		Expiration: int32(cacheMcExpires.Seconds())})
 
 	return orders, nil
 }
@@ -99,7 +102,10 @@ func (c *OrderCache) OrdersForType(typeid int, regionid int) ([]eccore.MarketOrd
 		if !orderEntry.At.Add(cacheExpires).After(time.Now()) {
 			return orderEntry.Orders, nil
 		} else {
-			return c.hydrateSingleOrder(typeid, regionid)
+			// We will hydrate an order asynchronously, but
+			// also return the current cached value.
+			go c.hydrateSingleOrder(typeid, regionid)
+			return orderEntry.Orders, nil
 		}
 	}
 }
