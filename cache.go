@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/evecentral/eccore"
 	"github.com/theatrus/gomemcache/memcache"
+	"log"
 	"time"
 )
 
@@ -20,7 +21,7 @@ var (
 	cacheExpires = 5 * time.Minute
 
 	// Memcache expiration for the key
-	cacheMcExpires = 6 * time.Hour 
+	cacheMcExpires = 6 * time.Hour
 )
 
 type orderEntry struct {
@@ -64,6 +65,7 @@ func (c *OrderCache) hydrateSingleOrder(typeid int, regionid int) ([]eccore.Mark
 
 	orders, err := c.Hydrator.OrdersForType(typeid, regionid)
 	if err != nil {
+		log.Printf("hydration error: %s", err)
 		return nil, err
 	}
 
@@ -98,8 +100,9 @@ func (c *OrderCache) OrdersForType(typeid int, regionid int) ([]eccore.MarketOrd
 		if err != nil {
 			return nil, err
 		}
+
 		// Entry too old?
-		if !orderEntry.At.Add(cacheExpires).After(time.Now()) {
+		if orderEntry.At.Add(cacheExpires).After(time.Now()) {
 			return orderEntry.Orders, nil
 		} else {
 			// We will hydrate an order asynchronously, but

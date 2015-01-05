@@ -72,8 +72,11 @@ func main() {
 	orderCache := &ecorder.OrderCache{Hydrator: hydrator,
 		Mc: mc}
 
-	test, err := orderCache.OrdersForType(34, 10000002)
-	log.Printf("%s", test)
+	_, err = orderCache.OrdersForType(34, 10000002)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//log.Printf("%s", test)
 
 	rtr := mux.NewRouter()
 
