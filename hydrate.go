@@ -55,3 +55,21 @@ func (ch *crestHydrator) OrdersForType(typeid int, regionid int) ([]eccore.Marke
 	}
 	return rOrders, nil
 }
+
+type dbStoreHydrator struct {
+	backend Hydrator
+	db      eccore.DBOrderStore
+}
+
+func NewDBStoreOrderHydrator(backend Hydrator, db eccore.DBOrderStore) (Hydrator, error) {
+	return &dbStoreHydrator{backend: backend, db: db}, nil
+}
+
+func (ch *dbStoreHydrator) OrdersForType(typeid int, regionid int) ([]eccore.MarketOrder, error) {
+	res, err := ch.backend.OrdersForType(typeid, regionid)
+	if err != nil {
+		return nil, err
+	}
+	go ch.db.UpdateOrders(eccore.Region{Id: regionid}, eccore.MarketType{Id: typeid}, res)
+	return res, nil
+}

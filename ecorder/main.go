@@ -68,15 +68,24 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.Println("Building DB facade hydrator")
+	dbOrderStore, err := eccore.NewOrderStore(db, static)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbHydrator, err := ecorder.NewDBStoreOrderHydrator(hydrator, dbOrderStore)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
 	log.Println("Building cache")
-	orderCache := &ecorder.OrderCache{Hydrator: hydrator,
+	orderCache := &ecorder.OrderCache{Hydrator: dbHydrator,
 		Mc: mc}
 
 	_, err = orderCache.OrdersForType(34, 10000002)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//log.Printf("%s", test)
 
 	rtr := mux.NewRouter()
 
