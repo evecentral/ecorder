@@ -4,7 +4,13 @@ import:
   version: ^0.6.0
   subpackages:
   - datastore
-1- package: github.com/go-openapi/runtime
+- package: github.com/evecentral/eccore
+- package: github.com/evecentral/esiapi
+  subpackages:
+  - client
+  - helper
+- package: github.com/evecentral/sdetools
+- package: github.com/go-openapi/runtime
   subpackages:
   - client
 - package: github.com/go-openapi/strfmt

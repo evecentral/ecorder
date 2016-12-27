@@ -1,8 +1,8 @@
 package ecorder
 
 import (
-	"github.com/evecentral/sdetools"
 	"github.com/evecentral/eccore"
+	"github.com/evecentral/sdetools"
 )
 
 type Hydrator interface {

@@ -3,19 +3,20 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/evecentral/eccore"
+	"time"
+
 	"github.com/evecentral/sdetools"
-	"github.com/evecentral/ecorder"
-	"github.com/gorilla/mux"
-		"cloud.google.com/go/datastore"
+
+	"cloud.google.com/go/datastore"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/gorilla/mux"
 	"github.com/theatrus/mediate"
 
-	"github.com/evecentral/esiapi"
 	"github.com/evecentral/esiapi/client"
 	"github.com/evecentral/esiapi/helper"
 
+	"context"
 
 	"gopkg.in/redis.v5"
 
@@ -30,11 +31,10 @@ var settingsFile string
 var tokenName string
 var project string
 
-
 func init() {
 	flag.IntVar(&ecorderPort, "ecorder.port", 1933, "Port for HTTP server")
-	flag.StringVar(&mcHost, "ecorder.redis.host", "localhost:11211", "Host:port for redis")
-	flag.String(&sdepath, "sde", "sde", "Path to the SDE root")
+	flag.StringVar(&redisHost, "ecorder.redis.host", "localhost:11211", "Host:port for redis")
+	flag.StringVar(&sdepath, "sde", "sde", "Path to the SDE root")
 	flag.StringVar(&settingsFile, "esi.settings", "settings.json", "Default settings file")
 	flag.StringVar(&project, "esi.ds.project", "", "Google Cloud Datastore Project")
 	flag.StringVar(&tokenName, "esi.token.name", "default-token", "Name of the token")
@@ -46,15 +46,15 @@ func main() {
 
 	log.Println("Connecting to redis")
 	rd := redis.NewClient(&redis.Options{
-		Addr: redisHost,
+		Addr:     redisHost,
 		Password: "",
-		DB: 0,
+		DB:       0,
 	})
-
+	rd.Set("a", "a", 0)
 
 	log.Println("Loading static SDE")
 	sde := sdetools.SDE{
-		BaseDir: *sdepath
+		BaseDir: sdepath,
 	}
 	sde.Init()
 
@@ -63,7 +63,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 
 	store, err := helper.NewDatastoreTokenStore(project, tokenName, 120*time.Second)
 	if err != nil {
@@ -83,13 +82,12 @@ func main() {
 	// Connect to cloud datastore
 	ctx := context.Background()
 
-	_, err := datastore.NewClient(ctx, project)
+	_, err = datastore.NewClient(ctx, project)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-
-	_ := client.New(cliTransport, strfmt.Default)
+	_ = client.New(cliTransport, strfmt.Default)
 
 	rtr := mux.NewRouter()
 

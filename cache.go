@@ -9,8 +9,8 @@ import (
 
 	"github.com/evecentral/eccore"
 
-	"gopkg.in/vmihailenco/msgpack.v2"
 	"gopkg.in/redis.v5"
+	"gopkg.in/vmihailenco/msgpack.v2"
 )
 
 var (
@@ -36,7 +36,7 @@ type orderEntry struct {
 // and an optional Hydrator interface for cache
 // misses
 type OrderCache struct {
-	redis       redis.Client
+	redis    redis.Client
 	Hydrator Hydrator
 }
 
@@ -47,7 +47,7 @@ func cacheKey(typeid int, regionid int) string {
 }
 
 func packOrder(entry orderEntry) []byte {
-	b, err := msgpack.Marshal(&order)
+	b, _ := msgpack.Marshal(&entry)
 	return b
 }
 
@@ -71,10 +71,7 @@ func (c *OrderCache) hydrateSingleOrder(typeid int, regionid int) ([]eccore.Mark
 	entry := orderEntry{Orders: orders, At: time.Now()}
 	encodedOrders := packOrder(entry)
 
-	c.Mc.Set(&memcache.Item{
-		Key:        key,
-		Value:      encodedOrders,
-		Expiration: int32(cacheMcExpires.Seconds())})
+	err = c.redis.Set(key, encodedOrders, cacheMcExpires).Err()
 
 	return orders, nil
 }
@@ -86,15 +83,15 @@ func (c *OrderCache) OrdersForType(typeid int, regionid int) ([]eccore.MarketOrd
 
 	key := cacheKey(typeid, regionid)
 
-	item, err := c.Mc.Get(key)
+	item, err := c.redis.Get(key).Bytes()
 
-	if err != nil && err != memcache.ErrCacheMiss {
+	if err != nil && err != redis.Nil {
 		return nil, err
-	} else if err == memcache.ErrCacheMiss {
+	} else if err == redis.Nil {
 		// Cache didn't return, now we hydrate and return
 		return c.hydrateSingleOrder(typeid, regionid)
 	} else {
-		orderEntry, err := unpackOrder(item.Value)
+		orderEntry, err := unpackOrder(item)
 		if err != nil {
 			return nil, err
 		}

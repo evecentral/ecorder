@@ -1,5 +1,5 @@
-hash: f03a02f05c358a40f2a9e2a2cb334a582c534a96df3d3ae264744b7a3c66c123
-updated: 2016-12-27T06:07:54.586220278Z
+hash: 05b1b7dad0bfe0b33256becffe0ef70cfec892aeb9e9ed0b545e22c19fc7562f
+updated: 2016-12-27T06:53:21.013848746Z
 imports:
 - name: cloud.google.com/go
   version: c116c7972ec94f148459a304d07a67ecbc770d4b
@@ -13,6 +13,34 @@ imports:
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
 - name: github.com/boltdb/bolt
   version: 583e8937c61f1af6513608ccc75c97b6abdf4ff9
+- name: github.com/evecentral/eccore
+  version: 0f3bfb5911873af12b40ed92021cf1f3d6c8948a
+- name: github.com/evecentral/esiapi
+  version: e4b562f281b3692f65d8f31608b00346a8976e2c
+  subpackages:
+  - client
+  - client/alliance
+  - client/bookmarks
+  - client/calendar
+  - client/character
+  - client/clones
+  - client/corporation
+  - client/dummy
+  - client/incursions
+  - client/killmails
+  - client/live
+  - client/location
+  - client/mail
+  - client/market
+  - client/search
+  - client/skills
+  - client/sovereignty
+  - client/universe
+  - client/wallet
+  - helper
+  - models
+- name: github.com/evecentral/sdetools
+  version: e428534bd6ca9f55592230ced8cf29fc5aac4001
 - name: github.com/go-openapi/analysis
   version: 7222828b8ce19afee3c595aef6643b9e42150120
 - name: github.com/go-openapi/errors
