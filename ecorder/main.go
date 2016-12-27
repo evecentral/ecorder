@@ -4,88 +4,92 @@ import (
 	"flag"
 	"fmt"
 	"github.com/evecentral/eccore"
+	"github.com/evecentral/sdetools"
 	"github.com/evecentral/ecorder"
 	"github.com/gorilla/mux"
-	"github.com/theatrus/crestmarket"
-	"github.com/theatrus/crestmarket/helper"
-	"github.com/theatrus/gomemcache/memcache"
+		"cloud.google.com/go/datastore"
+	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
+	"github.com/theatrus/mediate"
+
+	"github.com/evecentral/esiapi"
+	"github.com/evecentral/esiapi/client"
+	"github.com/evecentral/esiapi/helper"
+
+
+	"gopkg.in/redis.v5"
+
 	"log"
 	"net/http"
 )
 
 var ecorderPort int
-var mcHost string
+var redisHost string
+var sdepath string
+var settingsFile string
+var tokenName string
+var project string
+
 
 func init() {
 	flag.IntVar(&ecorderPort, "ecorder.port", 1933, "Port for HTTP server")
-	flag.StringVar(&mcHost, "ecorder.memcache.host", "localhost:11211", "Host:port for memcache, only one supported")
+	flag.StringVar(&mcHost, "ecorder.redis.host", "localhost:11211", "Host:port for redis")
+	flag.String(&sdepath, "sde", "sde", "Path to the SDE root")
+	flag.StringVar(&settingsFile, "esi.settings", "settings.json", "Default settings file")
+	flag.StringVar(&project, "esi.ds.project", "", "Google Cloud Datastore Project")
+	flag.StringVar(&tokenName, "esi.token.name", "default-token", "Name of the token")
+
 }
 
 func main() {
 	flag.Parse()
 
-	log.Println("Connecting to memcache")
-	mc := memcache.New(mcHost)
-	// Dummy write
-	mc.Set(&memcache.Item{Key: "test", Value: []byte("ok")})
+	log.Println("Connecting to redis")
+	rd := redis.NewClient(&redis.Options{
+		Addr: redisHost,
+		Password: "",
+		DB: 0,
+	})
 
-	log.Println("Connecting to the database")
-	db, err := eccore.NewDB()
+
+	log.Println("Loading static SDE")
+	sde := sdetools.SDE{
+		BaseDir: *sdepath
+	}
+	sde.Init()
+
+	log.Println("Loading tokens")
+	settings, err := helper.LoadSettings(settingsFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("Building a static cache of the universe")
-	static, err := eccore.NewStaticItemsFromDatabase(db)
+
+	store, err := helper.NewDatastoreTokenStore(project, tokenName, 120*time.Second)
+	if err != nil {
+		fmt.Printf("Can't load datastore %v\n", err)
+		return
+	}
+
+	transport, err := helper.InteractiveStartupWithTokenStore(store, settings)
+	if err != nil {
+		fmt.Printf("Can't do startup %v\n", err)
+		return
+	}
+
+	cliTransport := httptransport.New("esi.tech.ccp.is", "/latest", []string{"https"})
+	cliTransport.Transport = mediate.RateLimit(10, 1*time.Second, transport)
+
+	// Connect to cloud datastore
+	ctx := context.Background()
+
+	_, err := datastore.NewClient(ctx, project)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("Loading CREST settings")
-	settings, err := crestmarket.LoadSettings("settings.json")
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	log.Println("CREST authentication")
-	transport, err := helper.InteractiveStartup("token.json", settings)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	requestor, err := crestmarket.NewCrestRequestor(transport)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if requestor == nil {
-		log.Fatal("wut")
-	}
-
-	log.Println("Building hydrator")
-	hydrator, err := ecorder.NewCrestHydrator(requestor, static)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Building DB facade hydrator")
-	dbOrderStore, err := eccore.NewOrderStore(db, static)
-	if err != nil {
-		log.Fatal(err)
-	}
-	dbHydrator, err := ecorder.NewDBStoreOrderHydrator(hydrator, dbOrderStore)
-	if err != nil {
-		log.Fatal(err)
-	}
-	
-	log.Println("Building cache")
-	orderCache := &ecorder.OrderCache{Hydrator: dbHydrator,
-		Mc: mc}
-
-	_, err = orderCache.OrdersForType(34, 10000002)
-	if err != nil {
-		log.Fatal(err)
-	}
+	_ := client.New(cliTransport, strfmt.Default)
 
 	rtr := mux.NewRouter()
 

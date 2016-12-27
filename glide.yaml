@@ -1,0 +1,17 @@
+package: github.com/evecentral/ecorder
+import:
+- package: cloud.google.com/go
+  version: ^0.6.0
+  subpackages:
+  - datastore
+1- package: github.com/go-openapi/runtime
+  subpackages:
+  - client
+- package: github.com/go-openapi/strfmt
+- package: github.com/gorilla/mux
+  version: ^1.1.0
+- package: github.com/theatrus/mediate
+- package: gopkg.in/redis.v5
+  version: ^5.1.6
+- package: gopkg.in/vmihailenco/msgpack.v2
+  version: ^2.8.2

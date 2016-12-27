@@ -1,14 +1,16 @@
 package ecorder
 
 import (
-	"bytes"
-	"encoding/gob"
 	"errors"
 	"fmt"
-	"github.com/evecentral/eccore"
-	"github.com/theatrus/gomemcache/memcache"
+
 	"log"
 	"time"
+
+	"github.com/evecentral/eccore"
+
+	"gopkg.in/vmihailenco/msgpack.v2"
+	"gopkg.in/redis.v5"
 )
 
 var (
@@ -34,7 +36,7 @@ type orderEntry struct {
 // and an optional Hydrator interface for cache
 // misses
 type OrderCache struct {
-	Mc       memcache.Client
+	redis       redis.Client
 	Hydrator Hydrator
 }
 
@@ -45,17 +47,13 @@ func cacheKey(typeid int, regionid int) string {
 }
 
 func packOrder(entry orderEntry) []byte {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	enc.Encode(entry)
-	return buf.Bytes()
+	b, err := msgpack.Marshal(&order)
+	return b
 }
 
-func unpackOrder(value []byte) (orderEntry, error) {
-	dec := gob.NewDecoder(bytes.NewReader(value))
-	var entry orderEntry
-	err := dec.Decode(&entry)
-	return entry, err
+func unpackOrder(value []byte) (oe *orderEntry, err error) {
+	err = msgpack.Unmarshal(value, &oe)
+	return
 }
 
 func (c *OrderCache) hydrateSingleOrder(typeid int, regionid int) ([]eccore.MarketOrder, error) {
