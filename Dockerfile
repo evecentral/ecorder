@@ -4,5 +4,5 @@ WORKDIR /go/src/github.com/evecentral/ecorder
 RUN go get -v -u github.com/Masterminds/glide
 ADD . /go/src/github.com/evecentral/ecorder
 RUN glide update && glide install
-RUN go build -o ecorder ./ecorder/main.go
-CMD ["/go/src/github.com/evecentral/ecorder/ecorder"]
+RUN go build -o ecorder-bin ./ecorder/main.go
+CMD ["/go/src/github.com/evecentral/ecorder/ecorder-bin"]
