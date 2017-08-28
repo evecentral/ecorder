@@ -1,102 +1,116 @@
 hash: 05b1b7dad0bfe0b33256becffe0ef70cfec892aeb9e9ed0b545e22c19fc7562f
-updated: 2016-12-27T06:53:21.013848746Z
+updated: 2017-08-27T20:07:36.738896907-07:00
 imports:
 - name: cloud.google.com/go
-  version: c116c7972ec94f148459a304d07a67ecbc770d4b
+  version: 0f0b8420cb699ac4ce059c63bac263f4301fe95b
   subpackages:
   - compute/metadata
   - datastore
   - internal
   - internal/atomiccache
   - internal/fields
+  - internal/version
 - name: github.com/asaskevich/govalidator
-  version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
+  version: 15028e809df8c71964e8efa6c11e81d5c0262302
 - name: github.com/boltdb/bolt
-  version: 583e8937c61f1af6513608ccc75c97b6abdf4ff9
+  version: 2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8
 - name: github.com/evecentral/eccore
   version: 0f3bfb5911873af12b40ed92021cf1f3d6c8948a
 - name: github.com/evecentral/esiapi
-  version: e4b562f281b3692f65d8f31608b00346a8976e2c
+  version: 9bd83fb3701191a049a89ecdaae9d06349c58d08
   subpackages:
   - client
   - client/alliance
+  - client/assets
   - client/bookmarks
   - client/calendar
   - client/character
   - client/clones
+  - client/contacts
+  - client/contracts
   - client/corporation
-  - client/dummy
+  - client/dogma
+  - client/faction_warfare
+  - client/fittings
+  - client/fleets
   - client/incursions
+  - client/industry
+  - client/insurance
   - client/killmails
-  - client/live
   - client/location
+  - client/loyalty
   - client/mail
   - client/market
+  - client/opportunities
+  - client/planetary_interaction
+  - client/routes
   - client/search
   - client/skills
   - client/sovereignty
+  - client/status
   - client/universe
+  - client/user_interface
   - client/wallet
+  - client/wars
   - helper
   - models
 - name: github.com/evecentral/sdetools
   version: e428534bd6ca9f55592230ced8cf29fc5aac4001
 - name: github.com/go-openapi/analysis
-  version: 7222828b8ce19afee3c595aef6643b9e42150120
+  version: 8ed83f2ea9f00f945516462951a288eaa68bf0d6
 - name: github.com/go-openapi/errors
-  version: 49fe8b3a0e0d32a617d8d50c67f856ad6e45b28b
+  version: 03cfca65330da08a5a440053faf994a3c682b5bf
 - name: github.com/go-openapi/jsonpointer
-  version: 8d96a2dc61536b690bd36b2e9df0b3c0b62825b2
+  version: 779f45308c19820f1a69e9a4cd965f496e0da10f
 - name: github.com/go-openapi/jsonreference
   version: 36d33bfe519efae5632669801b180bf1a245da3b
 - name: github.com/go-openapi/loads
-  version: bf98340e04734f11563fd3008e87be4c1d4ffc08
-  subpackages:
-  - fmts
+  version: a80dea3052f00e5f032e860dd7355cd0cc67e24d
 - name: github.com/go-openapi/runtime
-  version: 4163fbe94510110937046fe9c89b6a1673ce8190
+  version: d6605b7c17ac3b1033ca794886e6142a4141f5b0
   subpackages:
   - client
 - name: github.com/go-openapi/spec
-  version: 2b6b49e4af09051a736e3403b5df9b6ed151d0a3
+  version: 3faa0055dbbf2110abc1f3b4e3adbb22721e96e7
 - name: github.com/go-openapi/strfmt
-  version: 34fc3ba7c0f5fb615fda47a2b4fbd4c641b215f2
+  version: 610b6cacdcde6852f4de68998bd20ce1dac85b22
 - name: github.com/go-openapi/swag
-  version: 96d7b9ebd181a1735a1c9ac87914f2b32fbf56c9
+  version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
 - name: github.com/go-openapi/validate
-  version: b11dbf889b64cf815a7e2667412df313f4a3f17b
+  version: 8a82927c942c94794a5cd8b8b50ce2f48a955c0c
 - name: github.com/golang/protobuf
-  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
+  version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
   - proto
   - protoc-gen-go/descriptor
+  - ptypes/any
   - ptypes/struct
   - ptypes/timestamp
   - ptypes/wrappers
 - name: github.com/googleapis/gax-go
-  version: da06d194a00e19ce00d9011a13931c3f6f6887c7
+  version: 2cadd475a3e966ec9b77a21afc530dbacec6d613
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
-  version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
+  version: bcd8bc72b08df0f70df986b97f95590779502d31
 - name: github.com/mailru/easyjson
-  version: 9d6630dc8c577b56cb9687a9cf9e8578aca7298a
+  version: 2f5df55504ebc322e4d52d34df6a1f5b503bf26d
   subpackages:
   - buffer
   - jlexer
   - jwriter
 - name: github.com/mitchellh/mapstructure
-  version: bfdb1a85537d60bc7e954e600c250219ea497417
+  version: d0303fe809921458f417bcf828397a65db30a7e4
 - name: github.com/PuerkitoBio/purell
-  version: 0bcb03f4b4d0a9428594752bd2a3b9aa0a9d4bd4
+  version: 7cf257f0a33260797b0febf39f95fccd86aab2a3
 - name: github.com/PuerkitoBio/urlesc
-  version: 5bd2802263f21d8788851d5305584c82a5c75d7e
+  version: de5bf2ad457846296e2031421a34e2568e304e35
 - name: github.com/theatrus/mediate
   version: 5ef657d6d16033840e66dab2e1e48e233ccf0bc2
 - name: github.com/theatrus/ooauth2
   version: 69d8603ed24330f91b27ca59b193dedab06fe73f
 - name: golang.org/x/net
-  version: 45e771701b814666a7eb299e6c7a57d0b1799e91
+  version: 906cda9512f77671ab44f8c8563b13a8e707b230
   subpackages:
   - context
   - context/ctxhttp
@@ -107,32 +121,31 @@ imports:
   - lex/httplex
   - trace
 - name: golang.org/x/oauth2
-  version: 314dd2c0bf3ebd592ec0d20847d27e79d0dbe8dd
+  version: 9a379c6b3e95a790ffc43293c2a78dee0d7b6e20
   subpackages:
   - google
   - internal
   - jws
   - jwt
 - name: golang.org/x/sys
-  version: d75a52659825e75fff6158388dddc6a5b04f9ba5
+  version: 7a56174f0086b32866ebd746a794417edbc678a1
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: a49bea13b776691cb1b49873e5d8df96ec74831a
+  version: e56139fd9c5bc7244c76116c68e500765bb6db6b
   subpackages:
   - transform
   - unicode/norm
   - width
 - name: google.golang.org/api
-  version: 55146ba61254fdb1c26d65ff3c04bc1611ad73fb
+  version: dd6bdadc5852eae2d133075a3690d6ad744add48
   subpackages:
-  - googleapi/transport
   - internal
   - iterator
   - option
-  - transport
+  - transport/grpc
 - name: google.golang.org/appengine
-  version: 08a149cfaee099e6ce4be01c0113a78c85ee1dee
+  version: d9a072cfa7b9736e44311ef77b3e09d804bfa599
   subpackages:
   - datastore
   - internal
@@ -147,27 +160,36 @@ imports:
   - socket
   - urlfetch
 - name: google.golang.org/genproto
-  version: b3e7c2fb04031add52c4817f53f43757ccbf9c18
+  version: 411e09b969b1170a9f0c467558eb4c4c110d9c77
   subpackages:
   - googleapis/api/annotations
   - googleapis/datastore/v1
+  - googleapis/rpc/status
   - googleapis/type/latlng
 - name: google.golang.org/grpc
-  version: 9d682f9293b408c42d17c587d0e2a31237ac3f10
+  version: d2e1b51f33ff8c5e4a15560ff049d200e83726c5
   subpackages:
   - codes
   - credentials
   - credentials/oauth
+  - grpclb/grpc_lb_v1
   - grpclog
   - internal
+  - keepalive
   - metadata
   - naming
   - peer
   - stats
+  - status
   - tap
   - transport
+- name: gopkg.in/mgo.v2
+  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+  subpackages:
+  - bson
+  - internal/json
 - name: gopkg.in/redis.v5
-  version: b7bae3a78050e2e7ec2130a05cde296a9ff2e9c0
+  version: a16aeec10ff407b1e7be6dd35797ccf5426ef0f0
   subpackages:
   - internal
   - internal/consistenthash
@@ -175,9 +197,9 @@ imports:
   - internal/pool
   - internal/proto
 - name: gopkg.in/vmihailenco/msgpack.v2
-  version: 94af6ea04d2da6a09d6914ca79b8fb94f3acbba4
+  version: f4f8982de4ef0de18be76456617cc3f5d8d8141e
   subpackages:
   - codes
 - name: gopkg.in/yaml.v2
-  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
+  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
 testImports: []
